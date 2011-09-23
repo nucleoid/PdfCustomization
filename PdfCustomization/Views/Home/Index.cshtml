@@ -1,0 +1,26 @@
+﻿@using PdfCustomization.Models
+@model TemplateModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<h2>Customize the template</h2>
+
+@using (Html.BeginForm("SaveTemplate", "Home"))
+{
+    <fieldset>
+            <legend>Template</legend>
+
+            <div class="editor-label">
+                @Html.LabelFor(m => m.Template)
+            </div>
+            <div class="editor-field">
+                @Html.TextAreaFor(m => m.Template, 20, 75, null)
+                @Html.ValidationMessageFor(m => m.Template)
+            </div>
+
+            <p>
+                <input type="submit" value="Generate Pdf" />
+            </p>
+        </fieldset>
+}

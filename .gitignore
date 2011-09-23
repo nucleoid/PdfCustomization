@@ -1,0 +1,23 @@
+# Logs and databases #
+######################
+*.log
+
+# OS generated files #
+######################
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Visual Studio / ReSharper Stuff #
+######################
+*resharper.user
+[Dd]ebug/
+[Rr]elease/
+*.sln.cache
+*.suo
+*.csproj.user
+*[Rr]e[Ss]harper.user
+_ReSharper.*/
+bin/
+obj/
