@@ -322,3 +322,9 @@ div#title {
 .tri-state {
     width: 6em;
 }
+.align-right {
+    float: right;
+}
+.align-left {
+    float: left;
+}

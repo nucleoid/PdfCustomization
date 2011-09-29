@@ -80,6 +80,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\Price.cs" />
+    <Compile Include="Models\QuarterlyCommitment.cs" />
     <Compile Include="Models\TemplateModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="PdfConvert.cs" />
