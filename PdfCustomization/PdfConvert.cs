@@ -75,12 +75,9 @@ namespace PdfCustomization
 				environment = Environment;
 
 			String outputPdfFilePath;
-			bool delete;
+			bool delete = false;
 			if (woutput.OutputFilePath != null)
-			{
 				outputPdfFilePath = woutput.OutputFilePath;
-				delete = false;
-			}
 			else
 			{
 				outputPdfFilePath = Path.Combine(environment.TempFolderPath, String.Format("{0}.pdf", Guid.NewGuid()));
@@ -88,25 +85,9 @@ namespace PdfCustomization
 			}
 
 			if (!File.Exists(environment.WkHtmlToPdfPath))
-				throw new PdfConvertException(String.Format("File '{0}' not found. Check if wkhtmltopdf application is installed.", environment.WkHtmlToPdfPath));
+				throw new PdfConvertException(String.Format("File '{0}' not found. Make sure wkhtmltopdf files exist.", environment.WkHtmlToPdfPath));
 
-		    var paramsBuilder = new StringBuilder();
-            paramsBuilder.Append("--page-size A4 ");
-			if (!string.IsNullOrEmpty(document.HeaderUrl))
-            {
-				paramsBuilder.AppendFormat("--header-html {0} ", document.HeaderUrl);
-                paramsBuilder.Append("--margin-top 25 ");
-                paramsBuilder.Append("--header-spacing 5 ");
-            }
-			if (!string.IsNullOrEmpty(document.FooterUrl))
-            {
-				paramsBuilder.AppendFormat("--footer-html {0} ", document.FooterUrl);
-                paramsBuilder.Append("--margin-bottom 25 ");
-                paramsBuilder.Append("--footer-spacing 5 ");
-            }
-            
-			paramsBuilder.AppendFormat("\"{0}\" \"{1}\"", document.Url, outputPdfFilePath);
-
+		    var paramsBuilder = BuildParameters(document, outputPdfFilePath);
 
 		    var si = new ProcessStartInfo
 		        {
@@ -121,37 +102,13 @@ namespace PdfCustomization
 			{
 				using (var process = new Process())
 				{
-					process.StartInfo = si;
-					process.Start();
-
-					if (!process.WaitForExit(environment.Timeout))
-						throw new PdfConvertTimeoutException();
-
-					if (process.ExitCode != 0)
-					{
-						var error = si.RedirectStandardError ? process.StandardError.ReadToEnd() : String.Format("Process exited with code {0}.", process.ExitCode);						
-						throw new PdfConvertException(String.Format("Html to PDF conversion of '{0}' failed. Wkhtmltopdf output: \r\n{1}", document.Url, error));
-					}
+                    ProcessHtmlToPdf(si, process, environment, document);
 
 					if (!File.Exists(outputPdfFilePath))
 						throw new PdfConvertException(String.Format("Html to PDF conversion of '{0}' failed. Reason: Output file '{1}' not found.", document.Url, outputPdfFilePath));
 
-					if (woutput.OutputStream != null)
-					{
-						using (Stream fs = new FileStream(outputPdfFilePath, FileMode.Open))
-						{
-							var buffer = new byte[32 * 1024];
-							int read;
-
-							while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
-								woutput.OutputStream.Write(buffer, 0, read);
-						}
-					}
-
-					if (woutput.OutputCallback != null)
-					{
-						woutput.OutputCallback(document, File.ReadAllBytes(outputPdfFilePath));
-					}
+					WriteOutput(woutput, outputPdfFilePath);
+					ExecuteCallback(document, woutput, outputPdfFilePath);
 				}
 			}
 			finally
@@ -159,6 +116,63 @@ namespace PdfCustomization
 				if (delete && File.Exists(outputPdfFilePath))
 					File.Delete(outputPdfFilePath);
 			}
+        }
+
+        private static void ProcessHtmlToPdf(ProcessStartInfo si, Process process, PdfConvertEnvironment environment, PdfDocument document)
+        {
+            process.StartInfo = si;
+            process.Start();
+
+            if (!process.WaitForExit(environment.Timeout))
+                throw new PdfConvertTimeoutException();
+            if (process.ExitCode != 0)
+            {
+                var error = si.RedirectStandardError ? process.StandardError.ReadToEnd() : String.Format("Process exited with code {0}.", process.ExitCode);
+                throw new PdfConvertException(String.Format("Html to PDF conversion of '{0}' failed. Wkhtmltopdf output: \r\n{1}", document.Url, error));
+            }
+        }
+
+        private static void ExecuteCallback(PdfDocument document, PdfOutput woutput, string outputPdfFilePath)
+        {
+            if (woutput.OutputCallback != null)
+            {
+                woutput.OutputCallback(document, File.ReadAllBytes(outputPdfFilePath));
+            }
+        }
+
+        private static void WriteOutput(PdfOutput woutput, string outputPdfFilePath)
+        {
+            if (woutput.OutputStream != null)
+            {
+                using (Stream fs = new FileStream(outputPdfFilePath, FileMode.Open))
+                {
+                    var buffer = new byte[32*1024];
+                    int read;
+
+                    while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
+                        woutput.OutputStream.Write(buffer, 0, read);
+                }
+            }
+        }
+
+        private static StringBuilder BuildParameters(PdfDocument document, string outputPdfFilePath)
+        {
+            var paramsBuilder = new StringBuilder();
+            paramsBuilder.Append("--page-size A4 ");
+            if (!string.IsNullOrEmpty(document.HeaderUrl))
+            {
+                paramsBuilder.AppendFormat("--header-html {0} ", document.HeaderUrl);
+                paramsBuilder.Append("--margin-top 25 ");
+                paramsBuilder.Append("--header-spacing 5 ");
+            }
+            if (!string.IsNullOrEmpty(document.FooterUrl))
+            {
+                paramsBuilder.AppendFormat("--footer-html {0} ", document.FooterUrl);
+                paramsBuilder.Append("--margin-bottom 25 ");
+                paramsBuilder.Append("--footer-spacing 5 ");
+            }
+            paramsBuilder.AppendFormat("\"{0}\" \"{1}\"", document.Url, outputPdfFilePath);
+            return paramsBuilder;
         }
     }
 }

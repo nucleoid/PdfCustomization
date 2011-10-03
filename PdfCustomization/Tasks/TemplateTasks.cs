@@ -41,9 +41,9 @@ namespace PdfCustomization.Tasks
                            Address = "210 N 5th Ave Fargo, ND 58103",
                            Contact = "Mr. Important Guy",
                            fax = "701-203-5689",
-                           Buyer = "Nick Swardson",
-                           Commitments = userModel.Commitments,
-                           Prices = userModel.Prices
+                           Buyer = "Nick Swardson", 
+                           userModel.Commitments, 
+                           userModel.Prices
                        };
         }
     }
