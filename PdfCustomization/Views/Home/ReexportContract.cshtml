@@ -1,4 +1,5 @@
-﻿@model PdfCustomization.Models.TemplateModel
+﻿@using PdfCustomization.Controllers
+@model PdfCustomization.Models.TemplateModel
 
 @{
     ViewBag.Title = "ReexportContract";
@@ -6,7 +7,7 @@
 }
 
 <h2>Customize the template</h2>
-
+<div>Other templates: @(Html.ActionLink<HomeController>(c => c.Index(), "Index")) @(Html.ActionLink<HomeController>(c => c.ContractAgreement(), "Contract Agreement")) @(Html.ActionLink<HomeController>(c => c.ExportContract(), "Export Contract"))</div>
 @using (Html.BeginForm("SaveTemplate", "Home"))
 {
     <fieldset>
