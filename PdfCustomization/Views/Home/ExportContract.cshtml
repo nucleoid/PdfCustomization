@@ -1,0 +1,60 @@
+﻿@model PdfCustomization.Models.TemplateModel
+
+@{
+    ViewBag.Title = "ExportContract";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Customize the template</h2>
+
+@using (Html.BeginForm("SaveTemplate", "Home"))
+{
+    <fieldset>
+            <legend>Template</legend>
+            <div style="min-width: 1050px;">
+                <div class="align-left">
+                    <div class="editor-label">
+                        @Html.LabelFor(m => m.Template)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextAreaFor(m => m.Template, 20, 75, null)
+                        @Html.ValidationMessageFor(m => m.Template)
+                    </div>
+                    <p>
+                        <input type="submit" value="Generate Pdf" />
+                    </p>
+                </div>
+                <div class="align-right">
+                <div class="display-label"><label style="text-decoration: underline">Available tokens</label></div>
+                <ul style="margin:0;padding:.5em 0 0 0;">
+                    <li>@@Model.month - current month ex. Sep.</li>
+                    <li>@@Model.day - current day number ex. 20</li>
+                    <li>@@Model.year - current year ex. 2011</li>
+                    <li>@@Model.effectiveDate - effective date ex. Sep 29, 2011</li>
+                    <li>@@Model.Customer - buyer name ex. @User.Identity.Name</li>
+                    <li>@@Model.Address - buyer address ex. 210 N 5th Ave Fargo, ND 58103</li>
+                    <li>@@Model.Contact - contact name ex. Mr. Important Guy</li>
+                    <li>@@Model.fax - buyer fax number ex. 701-203-5689</li>
+                    <li>@@Model.Buyer - signing buyer ex. Nick Swardson</li>
+                    <li>@@Model.Commitments - collection of <br />PdfCustomization.Models.QuarterlyCommitment
+                        <ul>
+                            <li>Quarter - quarter date rante ex. 3/1/2009 – 6/30/2009</li>
+                            <li>QuantityOfSugar - quantity of sugar (cwt) ex. 250,000</li>
+                        </ul>
+                    </li>
+                    <li>@@Model.Prices - collection of <br />PdfCustomization.Models.Price 
+                        <ul>
+                            <li>DeliveryLocation - delivery location ex. RRV</li>
+                            <li>State - state ex. MN</li>
+                            <li>PackageSizeAndType - package size/type ex. cwt</li>
+                            <li>Mode - mode ex. Magic</li>
+                            <li>TotalPrice - total price ex. $340.00</li>
+                            <li>UnitPrice - unit price ex. $34.00</li>
+                        </ul>
+                    </li>
+                </ul>
+                </div>
+            </div>
+        </fieldset>
+}
+

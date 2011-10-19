@@ -1,11 +1,15 @@
-﻿@using PdfCustomization.Models
+﻿@using PdfCustomization.Controllers
+@using PdfCustomization.Models
 @model TemplateModel
 @{
     ViewBag.Title = "Home Page";
 }
 
-<h2>Customize the template</h2>
+<h3>Chart Spike</h3>
+@Html.Image(Url.Action("LineChart", "Chart"), "line chart") 
 
+<h2>Customize the template</h2>
+<div>Other templates: @(Html.ActionLink<HomeController>(c => c.ContractAgreement(), "Contract Agreement")) @(Html.ActionLink<HomeController>(c => c.ExportContract(), "Export Contract")) @(Html.ActionLink<HomeController>(c => c.ReexportContract(), "Reexport Contract"))</div>
 @using (Html.BeginForm("SaveTemplate", "Home"))
 {
     <fieldset>

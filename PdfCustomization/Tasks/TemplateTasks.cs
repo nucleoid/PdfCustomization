@@ -17,6 +17,24 @@ namespace PdfCustomization.Tasks
             return templateText;
         }
 
+        public string GenerateContractAgreementTemplate()
+        {
+            var templateText = new StreamReader(GetType().Assembly.GetManifestResourceStream("PdfCustomization.Templates.ContractAgreement.cshtml")).ReadToEnd();
+            return templateText;
+        }
+
+        public string GenerateExportContractTemplate()
+        {
+            var templateText = new StreamReader(GetType().Assembly.GetManifestResourceStream("PdfCustomization.Templates.ExportContractTemplate.cshtml")).ReadToEnd();
+            return templateText;
+        }
+
+        public string GenerateReexportContractTemplate()
+        {
+            var templateText = new StreamReader(GetType().Assembly.GetManifestResourceStream("PdfCustomization.Templates.ReexportContractTemplate.cshtml")).ReadToEnd();
+            return templateText;
+        }
+
         public string ParseTemplate(string templateText, UserModel userModel)
         {
             if (!_initialized)

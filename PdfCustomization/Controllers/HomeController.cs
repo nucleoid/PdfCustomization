@@ -26,6 +26,27 @@ namespace PdfCustomization.Controllers
             return View(new TemplateModel{Template = defaultTemplate});
         }
 
+        [Authorize]
+        public ActionResult ContractAgreement()
+        {
+            var template = _templateTasks.GenerateContractAgreementTemplate();
+            return View(new TemplateModel { Template = template });
+        }
+
+        [Authorize]
+        public ActionResult ExportContract()
+        {
+            var template = _templateTasks.GenerateExportContractTemplate();
+            return View(new TemplateModel { Template = template });
+        }
+
+        [Authorize]
+        public ActionResult ReexportContract()
+        {
+            var template = _templateTasks.GenerateReexportContractTemplate();
+            return View(new TemplateModel { Template = template });
+        }
+
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult SaveTemplate(TemplateModel model)
@@ -35,7 +56,7 @@ namespace PdfCustomization.Controllers
             var action = Url.Action("UrlToGenerate", new {userName = User.Identity.Name});
             var fullUrl = string.Format("http://{0}{1}", Request.Url.Authority, action);
             var pdfStream = _pdfTasks.GeneratePdfStream(fullUrl);
-            return new PdfStreamResult(pdfStream) {FileDownloadName = "Purchase_Agreement.pdf"};
+            return new PdfStreamResult(pdfStream) {FileDownloadName = "Agreement.pdf"};
         }
 
         [ValidateInput(false)]
