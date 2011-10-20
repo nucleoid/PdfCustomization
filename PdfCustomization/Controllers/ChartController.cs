@@ -25,19 +25,32 @@ namespace PdfCustomization.Controllers
                 new Price {Mode = Mode.Online, UnitPrice = 57.89m, TotalPrice = 926.24m}
             };
 
+            var chart = GenerateChart(prices);
+
+            using (var ms = new MemoryStream())
+            {
+                chart.SaveImage(ms, ChartImageFormat.Png);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                return File(ms.ToArray(), "image/png", "chartspike.png");
+            }
+        }
+
+        private Chart GenerateChart(List<Price> prices)
+        {
             var font = new Font("Trebuchet MS", 8.25f, FontStyle.Bold);
             var chart = new Chart
-                            {
-                                Palette = ChartColorPalette.BrightPastel, 
-                                BackColor = Color.DarkOrange, 
-                                ImageType = ChartImageType.Png,
-                                Width = Unit.Pixel(824),
-                                Height = Unit.Pixel(592),
-                                BorderlineDashStyle = ChartDashStyle.Solid,
-                                BackGradientStyle = GradientStyle.TopBottom,
-                                BorderWidth = 2,
-                                BorderColor = Color.FromArgb(181, 64, 1),
-                            };
+            {
+                Palette = ChartColorPalette.BrightPastel,
+                BackColor = Color.Tan,
+                ImageType = ChartImageType.Png,
+                Width = Unit.Pixel(618),
+                Height = Unit.Pixel(444),
+                BorderlineDashStyle = ChartDashStyle.Solid,
+                BackGradientStyle = GradientStyle.TopBottom,
+                BorderWidth = 2,
+                BorderColor = Color.FromArgb(181, 64, 1),
+            };
             chart.Legends.Add("Legend1");
             chart.Legends[0].IsTextAutoFit = false;
             chart.Legends[0].BackColor = Color.Transparent;
@@ -45,76 +58,69 @@ namespace PdfCustomization.Controllers
             chart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
 
             var ca1 = new ChartArea("ca1")
-                          {
-                              BorderColor = Color.FromArgb(64),
-                              BorderDashStyle = ChartDashStyle.Solid,
-                              BackSecondaryColor = Color.White,
-                              BackColor = Color.OldLace,
-                              ShadowColor = Color.Transparent,
-                              BackGradientStyle = GradientStyle.TopBottom,
-                              AxisX =
-                                  {
-                                      Title = "Entry", 
-                                      LineColor = Color.FromArgb(64),
-                                      LabelStyle = new LabelStyle {Font = font},
-                                      MajorGrid = new Grid {LineColor = Color.FromArgb(64), Enabled = true}
-                                  },
-                              AxisY =
-                                  {
-                                      Title = "Price",
-                                      LineColor = Color.FromArgb(64),
-                                      LabelStyle = new LabelStyle { Font = font },
-                                      MajorGrid = new Grid { LineColor = Color.FromArgb(64), Enabled = true}
-                                  }, 
-                          };
+            {
+                BorderColor = Color.FromArgb(64),
+                BorderDashStyle = ChartDashStyle.Solid,
+                BackSecondaryColor = Color.White,
+                BackColor = Color.OldLace,
+                ShadowColor = Color.Transparent,
+                BackGradientStyle = GradientStyle.TopBottom,
+                AxisX =
+                    {
+                        Title = "Entry",
+                        LineColor = Color.FromArgb(64),
+                        LabelStyle = new LabelStyle {Font = font},
+                        MajorGrid = new Grid {LineColor = Color.DarkGray, Enabled = true}
+                    },
+                AxisY =
+                    {
+                        Title = "Price",
+                        LineColor = Color.FromArgb(64),
+                        LabelStyle = new LabelStyle {Font = font},
+                        MajorGrid = new Grid {LineColor = Color.DarkGray, Enabled = true}
+                    },
+            };
             chart.ChartAreas.Add(ca1);
 
             var series1 = new Series("Unit Price")
-                              {
-                                  MarkerSize = 8,
-                                  BorderWidth = 3,
-                                  XValueType = ChartValueType.Double,
-                                  ChartType = SeriesChartType.Line, 
-                                  MarkerStyle = MarkerStyle.Circle,
-                                  ShadowColor = Color.Black,
-                                  BorderColor = Color.Black,
-                                  Color = Color.DarkTurquoise,
-                                  ShadowOffset = 2,
-                                  YValueType = ChartValueType.Double,
-                                  ChartArea = "ca1", 
-                                  IsValueShownAsLabel = false, 
-                                  Font = font
-                              };
+            {
+                MarkerSize = 8,
+                BorderWidth = 3,
+                XValueType = ChartValueType.Double,
+                ChartType = SeriesChartType.Line,
+                MarkerStyle = MarkerStyle.Circle,
+                ShadowColor = Color.Black,
+                BorderColor = Color.Black,
+                Color = Color.DarkTurquoise,
+                ShadowOffset = 2,
+                YValueType = ChartValueType.Double,
+                ChartArea = "ca1",
+                IsValueShownAsLabel = true,
+                Font = font
+            };
             var series2 = new Series("Total Price")
-                              {
-                                  MarkerSize = 9,
-                                  BorderWidth = 3,
-                                  XValueType = ChartValueType.Double,
-                                  ChartType = SeriesChartType.Line,
-                                  MarkerStyle = MarkerStyle.Diamond,
-                                  ShadowColor = Color.Black,
-                                  BorderColor = Color.Black,
-                                  Color = Color.Red,
-                                  ShadowOffset = 2,
-                                  YValueType = ChartValueType.Double,
-                                  ChartArea = "ca1",
-                                  IsValueShownAsLabel = false,
-                                  Font = font
-                              };
+            {
+                MarkerSize = 9,
+                BorderWidth = 3,
+                XValueType = ChartValueType.Double,
+                ChartType = SeriesChartType.Line,
+                MarkerStyle = MarkerStyle.Diamond,
+                ShadowColor = Color.Black,
+                BorderColor = Color.Black,
+                Color = Color.Red,
+                ShadowOffset = 2,
+                YValueType = ChartValueType.Double,
+                ChartArea = "ca1",
+                IsValueShownAsLabel = true,
+                Font = font
+            };
             foreach (var unitPrice in prices.Select(x => Convert.ToDouble(x.UnitPrice)))
                 series1.Points.AddY(unitPrice);
             foreach (var totalPrice in prices.Select(x => Convert.ToDouble(x.TotalPrice)))
                 series2.Points.AddY(totalPrice);
             chart.Series.Add(series1);
             chart.Series.Add(series2);
-            
-            using (var ms = new MemoryStream())
-            {
-                chart.SaveImage(ms, ChartImageFormat.Png);
-                ms.Seek(0, SeekOrigin.Begin);
-
-                return File(ms.ToArray(), "image/png", "mychart.png");
-            }
+            return chart;
         }
     }
 }
